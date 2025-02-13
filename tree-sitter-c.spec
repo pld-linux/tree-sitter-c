@@ -1,11 +1,11 @@
 Summary:	C grammar for tree-sitter
 Name:		tree-sitter-c
-Version:	0.20.7
+Version:	0.23.5
 Release:	1
 License:	MIT
 Group:		Libraries
 Source0:	https://github.com/tree-sitter/tree-sitter-c/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	221b26911b81e1645447a4d237287682
+# Source0-md5:	5f3abada8e5ae0d63bd2a2c6eb963583
 URL:		https://github.com/tree-sitter/tree-sitter-c
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
