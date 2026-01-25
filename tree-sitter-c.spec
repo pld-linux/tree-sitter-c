@@ -34,7 +34,7 @@ Gramatyka języka C dla tree-sittera.
 Summary:	C parser for Neovim
 Summary(pl.UTF-8):	Analizator składni języka C dla Neovima
 Group:		Applications/Editors
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description -n neovim-parser-c
 C parser for Neovim.
@@ -71,7 +71,7 @@ install -d $RPM_BUILD_ROOT{%{_libdir},%{_libdir}/nvim/parser}
 cp -p libtree-sitter-c.so.%{version} $RPM_BUILD_ROOT%{_libdir}
 %{__ln_s} libtree-sitter-c.so.%{version} $RPM_BUILD_ROOT%{_libdir}/libtree-sitter-c.so.%{soname_ver}
 
-%{__ln_s} %{_libdir}/libtree-sitter-c.so.%{soname_ver} $RPM_BUILD_ROOT%{_libdir}/nvim/parser/c.so
+%{__ln_s} ../../libtree-sitter-c.so.%{soname_ver} $RPM_BUILD_ROOT%{_libdir}/nvim/parser/c.so
 
 %if %{with python3}
 %py3_install
