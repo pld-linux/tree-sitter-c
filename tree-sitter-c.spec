@@ -28,13 +28,37 @@ BuildRequires:	rpmbuild(macros) >= 1.714
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		soname_ver	0
+%define		soname_ver	15.0
 
 %description
 C grammar for tree-sitter.
 
 %description -l pl.UTF-8
 Gramatyka języka C dla tree-sittera.
+
+%package devel
+Summary:	Header files for tree-sitter-c
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki tree-sitter-c
+Group:		Development/Libraries
+Requires:	%{name}%{?_isa} = %{version}-%{release}
+
+%description devel
+Header files for tree-sitter-c.
+
+%description devel -l pl.UTF-8
+Pliki nagłówkowe biblioteki tree-sitter-c.
+
+%package static
+Summary:	Static tree-sitter-c library
+Summary(pl.UTF-8):	Statyczna biblioteka tree-sitter-c
+Group:		Development/Libraries
+Requires:	%{name}-devel%{?_isa} = %{version}-%{release}
+
+%description static
+Static tree-sitter-c library.
+
+%description static -l pl.UTF-8
+Statyczna biblioteka tree-sitter-c.
 
 %package -n neovim-parser-c
 Summary:	C parser for Neovim
@@ -64,7 +88,14 @@ Analizator składni języka C dla Pythona.
 %setup -q
 
 %build
-%{__cc} %{rpmldflags} %{rpmcppflags} %{rpmcflags} -fPIC -shared -Wl,-soname,libtree-sitter-c.so.%{soname_ver} src/parser.c -o libtree-sitter-c.so.%{version}
+%{__make} \
+	PREFIX="%{_prefix}" \
+	INCLUDEDIR="%{_includedir}" \
+	LIBDIR="%{_libdir}" \
+	PCLIBDIR="%{_pkgconfigdir}" \
+	CC="%{__cc}" \
+	CFLAGS="%{rpmcppflags} %{rpmcflags}" \
+	LDFLAGS="%{rpmldflags}"
 
 %if %{with python3}
 %py3_build
@@ -79,16 +110,22 @@ PYTHONPATH=$(readlink -f build-3/lib.*) \
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir},%{_libdir}/nvim/parser}
 
-cp -p libtree-sitter-c.so.%{version} $RPM_BUILD_ROOT%{_libdir}
-%{__ln_s} libtree-sitter-c.so.%{version} $RPM_BUILD_ROOT%{_libdir}/libtree-sitter-c.so.%{soname_ver}
+%{__make} install \
+	DESTDIR=$RPM_BUILD_ROOT \
+	PREFIX="%{_prefix}" \
+	INCLUDEDIR="%{_includedir}" \
+	LIBDIR="%{_libdir}" \
+	PCLIBDIR="%{_pkgconfigdir}"
 
 %{__ln_s} ../../libtree-sitter-c.so.%{soname_ver} $RPM_BUILD_ROOT%{_libdir}/nvim/parser/c.so
+
+# redundant symlink
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libtree-sitter-c.so.15
 
 %if %{with python3}
 %py3_install
 
 %{__rm} $RPM_BUILD_ROOT%{py3_sitedir}/tree_sitter_c/*.c
-
 %endif
 
 %clean
@@ -100,8 +137,17 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc LICENSE README.md
-%{_libdir}/libtree-sitter-c.so.*.*
-%ghost %{_libdir}/libtree-sitter-c.so.%{soname_ver}
+%{_libdir}/libtree-sitter-c.so.%{soname_ver}
+
+%files devel
+%defattr(644,root,root,755)
+%{_libdir}/libtree-sitter-c.so
+%{_includedir}/tree_sitter/tree-sitter-c.h
+%{_pkgconfigdir}/tree-sitter-c.pc
+
+%files static
+%defattr(644,root,root,755)
+%{_libdir}/libtree-sitter-c.a
 
 %files -n neovim-parser-c
 %defattr(644,root,root,755)
