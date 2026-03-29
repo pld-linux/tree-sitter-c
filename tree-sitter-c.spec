@@ -3,6 +3,8 @@
 %bcond_without	python3	# Python 3.x binding
 %bcond_without	tests	# Python binding load test
 
+%define		api_ver		15
+
 Summary:	C grammar for tree-sitter
 Summary(pl.UTF-8):	Gramatyka języka C dla tree-sittera
 Name:		tree-sitter-c
@@ -65,6 +67,7 @@ Summary:	C parser for Neovim
 Summary(pl.UTF-8):	Analizator składni języka C dla Neovima
 Group:		Applications/Editors
 Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires:	c-tree-sitter(abi)%{?_isa} = %{api_ver}
 
 %description -n neovim-parser-c
 C parser for Neovim.
@@ -116,6 +119,9 @@ install -d $RPM_BUILD_ROOT{%{_libdir},%{_libdir}/nvim/parser}
 	INCLUDEDIR="%{_includedir}" \
 	LIBDIR="%{_libdir}" \
 	PCLIBDIR="%{_pkgconfigdir}"
+
+# validate after all make invocations as make rule might have regenerated parser
+grep -q 'LANGUAGE_VERSION[[:space:]]*%{api_ver}$' src/parser.c
 
 %{__ln_s} ../../libtree-sitter-c.so.%{soname_ver} $RPM_BUILD_ROOT%{_libdir}/nvim/parser/c.so
 
